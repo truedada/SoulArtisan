@@ -15,7 +15,7 @@ function App() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isThinking, setIsThinking] = useState(false);
   const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: window.innerWidth / 4, y: window.innerHeight / 4 });
+  const [pan, setPan] = useState({ x: 0, y: 0 });
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showSidebar, setShowSidebar] = useState(true);
 
@@ -41,22 +41,26 @@ function App() {
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target?.result as string;
-      const newId = Math.random().toString(36).substr(2, 9);
-      const newItem: CanvasItem = {
-        id: newId,
-        type: 'image',
-        content: content,
-        x: (-pan.x + window.innerWidth/2) / zoom - 150,
-        y: (-pan.y + window.innerHeight/2) / zoom - 150,
-        width: 300,
-        height: 300,
-        status: 'completed',
-        label: file.name,
-        zIndex: 50,
-        layers: []
+      const img = new Image();
+      img.onload = () => {
+        const newId = Math.random().toString(36).substr(2, 9);
+        const newItem: CanvasItem = {
+          id: newId,
+          type: 'image',
+          content: content,
+          x: (-pan.x + window.innerWidth/2) / zoom - img.width/2,
+          y: (-pan.y + window.innerHeight/2) / zoom - img.height/2,
+          width: img.width,
+          height: img.height,
+          status: 'completed',
+          label: file.name,
+          zIndex: 50,
+          layers: []
+        };
+        setItems(prev => [...prev, newItem]);
+        setSelectedIds([newId]);
       };
-      setItems(prev => [...prev, newItem]);
-      setSelectedIds([newId]);
+      img.src = content;
     };
     reader.readAsDataURL(file);
   };
@@ -169,7 +173,7 @@ function App() {
 
   return (
     <div className="flex h-screen bg-[#fcfcfc] overflow-hidden font-sans text-gray-900">
-      <div className="flex-1 relative flex flex-col">
+      <div className="flex-1 relative flex flex-col min-w-0">
         <header className="absolute top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-3xl border-b border-gray-100 px-6 flex items-center justify-between z-30">
           <div className="flex items-center gap-4">
             <button onClick={() => setView('home')} className="flex items-center gap-3 group">
@@ -221,14 +225,14 @@ function App() {
         <Toolbar 
           zoom={zoom} 
           onZoomChange={setZoom} 
-          onResetView={() => { setZoom(1); setPan({ x: window.innerWidth / 4, y: window.innerHeight / 4 }); }}
+          onResetView={() => { setZoom(1); setPan({ x: 0, y: 0 }); }}
           onAddWorkflow={addWorkflow}
           onAddImage={addImageItem}
           onAddText={addTextItem}
         />
       </div>
 
-      <div className={`transition-all duration-300 ease-in-out ${showSidebar ? 'w-96 opacity-100 translate-x-0' : 'w-0 opacity-0 translate-x-full'}`}>
+      <div className={`flex-shrink-0 transition-all duration-300 ease-in-out ${showSidebar ? 'w-96 opacity-100 translate-x-0' : 'w-0 opacity-0 translate-x-full'}`}>
         <Sidebar messages={messages} plan={plan} isThinking={isThinking} onSendMessage={async (t) => {
           addMessage(t, 'user');
           setIsThinking(true);
