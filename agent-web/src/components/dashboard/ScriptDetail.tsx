@@ -18,15 +18,7 @@ import {
   createImageCharacter,
   createImageScene,
 } from '@/api/scriptResource';
-import {
-  createPictureResource,
-  batchCreatePictureResources,
-  pagePictureResources,
-  deletePictureResource,
-  type PictureResourceType,
-  type PictureResource,
-  RESOURCE_TYPE_LABELS,
-} from '@/api/pictureResource';
+
 import {
   getScriptResources as getVideoScriptResources,
   batchCreateVideoResources,
@@ -42,7 +34,7 @@ import type { Script } from '@/api/script';
 import type { ScriptResourceInfo, ResourceType } from '@/api/scriptResource';
 import { showWarning, showSuccess, upload } from '@/utils/request';
 import { IMAGE_STYLES } from '@/constants/enums';
-import PictureResourceList from './PictureResourceList';
+
 import VideoResourceTable from './VideoResourceTable';
 import './ScriptDetail.css';
 
@@ -75,15 +67,14 @@ const ScriptDetail: React.FC = () => {
   const [searchingUsers, setSearchingUsers] = useState(false);
   const [addingMembers, setAddingMembers] = useState(false);
 
-  // 图片资源状态
-  const [pictureResources, setPictureResources] = useState<PictureResource[]>([]);
+
 
   // 视频资源状态
   const [videoResources, setVideoResources] = useState<VideoResourceInfo[]>([]);
 
   // 手动添加模态框状态
   const [showAddModal, setShowAddModal] = useState(false);
-  const [addResourceCategory, setAddResourceCategory] = useState<PictureResourceType>('character');
+  const [addResourceCategory, setAddResourceCategory] = useState<'character' | 'scene' | 'prop' | 'skill'>('character');
   const [addResourceName, setAddResourceName] = useState('');
   const [addResourceUrl, setAddResourceUrl] = useState('');
   const [addResourceFormat, setAddResourceFormat] = useState('');
@@ -105,8 +96,7 @@ const ScriptDetail: React.FC = () => {
   // 预览模态框
   const [previewResource, setPreviewResource] = useState<ScriptResourceInfo | null>(null);
 
-  // 图片资源预览模态框
-  const [previewPictureResource, setPreviewPictureResource] = useState<PictureResource | null>(null);
+
 
   // 自动识别模态框状态
   const [showAutoDetectModal, setShowAutoDetectModal] = useState(false);
@@ -785,7 +775,7 @@ const ScriptDetail: React.FC = () => {
   };
 
   // 统计图片和视频资源数量
-  const imageResourceCount = pictureResources.length;
+  const imageResourceCount = 0;
   const videoResourceCount = videoResources.length;
 
   if (loading) {

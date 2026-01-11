@@ -169,23 +169,6 @@ CREATE TABLE `character_project_resources`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 48 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '角色项目资源关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for character_project_storyboard_resources
--- ----------------------------
-DROP TABLE IF EXISTS `character_project_storyboard_resources`;
-CREATE TABLE `character_project_storyboard_resources`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `storyboard_id` bigint NOT NULL COMMENT '分镜ID',
-  `resource_id` bigint NOT NULL COMMENT '资源ID（关联 video_resources.id）',
-  `resource_role` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '资源在分镜中的角色：main_character-主角，supporting-配角，scene-场景，prop-道具',
-  `sort_order` int NULL DEFAULT 0 COMMENT '排序顺序',
-  `created_at` datetime NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `uk_storyboard_resource`(`storyboard_id` ASC, `resource_id` ASC) USING BTREE,
-  INDEX `idx_storyboard_id`(`storyboard_id` ASC) USING BTREE,
-  INDEX `idx_resource_id`(`resource_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '分镜资源关联表' ROW_FORMAT = Dynamic;
-
--- ----------------------------
 -- Table structure for character_project_storyboard_videos
 -- ----------------------------
 DROP TABLE IF EXISTS `character_project_storyboard_videos`;
@@ -392,35 +375,6 @@ CREATE TABLE `image_generation_tasks`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1294 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '图像生成任务表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for picture_resources
--- ----------------------------
-DROP TABLE IF EXISTS `picture_resources`;
-CREATE TABLE `picture_resources`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `user_id` bigint NOT NULL COMMENT '用户ID',
-  `site_id` bigint NOT NULL COMMENT '站点ID',
-  `project_id` bigint NULL DEFAULT NULL COMMENT '项目ID',
-  `script_id` bigint NULL DEFAULT NULL COMMENT '剧本ID',
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '资源名称',
-  `type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '资源类型：character-角色, scene-场景, prop-道具, skill-技能',
-  `image_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '图片地址',
-  `prompt` varchar(1000) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '提示词',
-  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'generated' COMMENT '状态：pending-未生成, generating-生成中, generated-已生成',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
-  INDEX `idx_site_id`(`site_id` ASC) USING BTREE,
-  INDEX `idx_script_id`(`script_id` ASC) USING BTREE,
-  INDEX `idx_type`(`type` ASC) USING BTREE,
-  INDEX `idx_script_type`(`script_id` ASC, `type` ASC) USING BTREE,
-  INDEX `idx_status`(`status` ASC) USING BTREE,
-  INDEX `idx_script_status`(`script_id` ASC, `status` ASC) USING BTREE,
-  INDEX `idx_project_id`(`project_id` ASC) USING BTREE,
-  INDEX `idx_project_type`(`project_id` ASC, `type` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 124 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '图片资源表' ROW_FORMAT = Dynamic;
-
--- ----------------------------
 -- Table structure for points_config
 -- ----------------------------
 DROP TABLE IF EXISTS `points_config`;
@@ -461,45 +415,6 @@ CREATE TABLE `points_record`  (
   INDEX `idx_source`(`source` ASC) USING BTREE,
   INDEX `idx_created_at`(`created_at` ASC) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 4878 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '积分记录表' ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Table structure for script_members
--- ----------------------------
-DROP TABLE IF EXISTS `script_members`;
-CREATE TABLE `script_members`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `script_id` bigint NOT NULL COMMENT '剧本ID',
-  `user_id` bigint NOT NULL COMMENT '用户ID',
-  `role` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'member' COMMENT '角色: creator-创建者, member-成员',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `uk_script_user`(`script_id` ASC, `user_id` ASC) USING BTREE COMMENT '剧本用户唯一索引',
-  INDEX `idx_script_id`(`script_id` ASC) USING BTREE,
-  INDEX `idx_user_id`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 31 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '剧本成员关联表' ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Table structure for scripts
--- ----------------------------
-DROP TABLE IF EXISTS `scripts`;
-CREATE TABLE `scripts`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '剧本ID',
-  `user_id` bigint NOT NULL COMMENT '用户ID',
-  `site_id` bigint NOT NULL DEFAULT 1 COMMENT '所属站点ID',
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '剧本名称',
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '剧本描述',
-  `cover_image` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '封面图URL',
-  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT 'active' COMMENT '状态: active-活跃, archived-归档',
-  `style` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '剧本风格',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
-  INDEX `idx_site_id`(`site_id` ASC) USING BTREE,
-  INDEX `idx_status`(`status` ASC) USING BTREE,
-  INDEX `idx_created_at`(`created_at` ASC) USING BTREE,
-  INDEX `idx_style`(`style` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 25 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '剧本表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Table structure for site
